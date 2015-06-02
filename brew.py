@@ -33,9 +33,6 @@ parser.add_option("-s", "--status", action="store_true", dest="get_state", defau
 daemon = rpyc.connect(options.target, options.port);
 service = daemon.root
 
-if len(args) < 2:
-    teletype("Nothing like the smell of coffee in the morning!")
-    exit()
 
 if options.set_state:
     on = None
@@ -48,8 +45,15 @@ if options.set_state:
         on = not service.get_brewing()
 
     service.brew(on)
-    
-if options.get_state:
+   
     state = service.get_state()
     print(state)
 
+elif options.get_state:
+    state = service.get_state()
+    print(state)
+
+else:
+#elif len(sys.argv) < 2:
+    teletype("Nothing like the smell of coffee in the morning!")
+    exit()
