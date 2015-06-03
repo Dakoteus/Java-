@@ -1,5 +1,6 @@
 import time, os, curses, shutil, sys, random
-
+import math
+from termcolor import cprint
 
 def gif(path, delay=None):
     file = open(path, "r")
@@ -32,14 +33,15 @@ def banner(path, delay=None):
     length = int(data[1])
     (width, height) = shutil.get_terminal_size()
 
-    xtra = 0;
+    xtra = -len(lines);
     while xtra <= height:
         os.system('clear')
-        for i in range(xtra):
+        for i in range(xtra if xtra > 0 else 0):
             print()
         for i in range(len(lines)):
-            if i+xtra <= height:
-                print(lines[i])
+            if i+xtra <= height and i+xtra>=0:
+                cprint(lines[i],"red","on_blue", attrs=['bold'])
+
         xtra+=1
         time.sleep(delay)
 
