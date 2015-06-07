@@ -1,8 +1,16 @@
 import rpyc
-
+import os
 running = False
 
 class MyService(rpyc.Service):
+	def on():
+		if running is False:
+			os.system("echo gpio > /sys/class/gpio/export  && echo high > /sys/class/gpio/export/direction && echo low > /sys/class/gpio/export/direction")
+			running = True
+	def off():
+		if running is True:
+			os.system("echo gpio > /sys/class/gpio/export  && echo low > /sys/class/gpio/export/direction && echo high > /sys/class/gpio/export/direction")
+			running = False
     def on_connect(self):
         # code that runs when a connection is created
         # (to init the serivce, if needed)
