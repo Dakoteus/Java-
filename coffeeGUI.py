@@ -2,7 +2,7 @@ from tkinter import *
 import os
 class Application(Frame):
     def brewit(self):
-        os.system("cd /sys/class/gpio ; echo gpio20 > export; cd /gpio20 ; echo high > direction")
+        os.system("echo gpio > /sys/class/gpio/export  && echo high > /sys/class/gpio/export/direction")
 
     def createWidgets(self):
         self.QUIT = Button(self)
