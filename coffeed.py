@@ -1,8 +1,16 @@
 import rpyc
 import os
+import time
 running = False
 
 class MyService(rpyc.Service):
+	def CreateTimer(seconds, seconds2):
+	p = Process(target=Timer, args=(seconds,seconds2))
+	def Timer(seconds, seconds2, pin):
+	time.sleep(seconds)
+	Myservice.on(pin)
+	time.sleep(seconds2)
+	MyService.off(pin)
 	def on(pin):
 		if running is False:
 			os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio%s/direction && echo low > /sys/class/gpio%s/direction" % pin)
