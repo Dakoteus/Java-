@@ -25,18 +25,22 @@ class MyService(rpyc.Service):
         self.brew_off(pin)
     
     def brew_on(self):
-        if self.running is False:
+        if self.running == False:
+	    print self.running
             self.on(self.brew_pin)
             time.sleep(.3)
             self.off(self.brew_pin)
             self.running = True
+	    print self.running
     
     def brew_off(self):
-        if self.running is True:
+        if self.running == True:
+	    print self.running		
             self.on(self.brew_pin)
             time.sleep(.3)
             self.off(self.brew_pin)
             self.running = False
+	    print self.running
 
     def on(self, pin):
         os.system("echo high > /sys/class/gpio/gpio%s/direction" % pin)
@@ -74,8 +78,11 @@ class MyService(rpyc.Service):
         return self.running
 
     def exposed_get_state(self):
-        return "running = " + str(self.running)
-
+	print self.running
+        text = "running = " + str(self.running)
+	print self.running
+	return text
+	
     def exposed_brew(self, boolean):
         if(boolean):
             self.brew_on()
