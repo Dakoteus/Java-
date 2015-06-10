@@ -3,22 +3,57 @@ import os
 import time
 running = False
 
+timers=[]
+
+brew_pin = 60
+
+led_pins = [
+    30,
+    31,
+    48,
+    04,
+    03
+]
+
 class MyService(rpyc.Service):
-	def CreateTimer(seconds, seconds2):
-	p = Process(target=Timer, args=(seconds,seconds2))
-	def Timer(seconds, seconds2, pin):
+    def exposed_spawn_timer(seconds, seconds2):
+	p = Process(target=Timer, args=(seconds,seconds2,heater_pin))
+        timers.append(p)
+    
+    def timer(seconds, seconds2, pin):
 	time.sleep(seconds)
 	Myservice.on(pin)
 	time.sleep(seconds2)
 	MyService.off(pin)
-	def on(pin):
-		if running is False:
-			os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio%s/direction && echo low > /sys/class/gpio%s/direction" % pin)
-			running = True
-	def off(pin):
-		if running is True:
-			os.system("echo gpio%s > /sys/class/gpio/export  && echo low > /sys/class/gpio%s/direction && echo high > /sys/class/gpio%s/direction" % pin)
-			running = False
+    
+    def brew_on():
+    	if running is False:
+            on(brew_pin)
+            running = True
+    
+    def brew_off():
+	if running is True:
+            off(brew_pin)
+            running = False
+
+    def on(pin):
+        os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio%s/direction" % pin)
+        time.sleep(200)
+        os.system("echo low > /sys/class/gpio%s/direction" % pin)
+    
+    def off(pin):
+	os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio%s/direction" % pin)
+        time.sleep(200)
+        os.system("echo low > /sys/class/gpio%s/direction" % pin)
+
+    def led_on():
+        for pin in led_pins:
+            on(pin)
+
+    def led_off():
+        for pin in led_pins:
+            off(pin)
+
     def on_connect(self):
         # code that runs when a connection is created
         # (to init the serivce, if needed)
@@ -36,7 +71,10 @@ class MyService(rpyc.Service):
         return "running = " + str(running)
 
     def exposed_brew(self, boolean):
-        running = boolean
+        if(boolean):
+            on()
+        else:
+            off()
 
 
 if __name__ == "__main__":

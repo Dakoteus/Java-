@@ -116,7 +116,27 @@ class Graphic:
         else:
             self.posy = math.floor(self.window.height()/2 - self.ftf.frameHeight/2)
             self.maxy = self.posy + self.ftf.frameHeight
-        
+    def moveToLimit(self, x ,y):
+        if(x>0): 
+            if(self.posx<x):
+                delta = x-self.posx
+                self.posx+=delta
+                self.maxx+=delta
+        if(y>0):
+            if(self.posy<y):
+                delta = y-self.posy
+                self.posy+=delta
+                self.maxy+=delta
+        if(x<0): 
+            if(self.maxx>x):
+                delta = x-self.posx
+                self.posx+=delta
+                self.maxx+=delta
+        if(y<0):
+            if(self.maxy>y):
+                delta = self.maxy-y
+                self.posy-=delta
+                self.maxy-=delta
         
     def print_char(self, x, y, char, fg, bg, update=None):
         gx = x+self.posx
@@ -174,6 +194,7 @@ try:
 
     button = Graphic("button.txt",box)
     button.resizeToFTF(0,0)
+    #button.moveToLimit(0, -coffee_cup.posy)
     button.set_state(0)
 
     animation = coffee_cup.ftf.animateYield()
