@@ -4,18 +4,19 @@ import time
 
 coffee_port = 7986
 
+running = False
+
+timers=[]   
+
+brew_pin = 60
+
+led_pins = [30, 31, 48, 4, 3 ]
+led_go = True
+
 class MyService(rpyc.Service):
-    running = False
-
-    timers=[]   
-
-    brew_pin = 60
-
-    led_pins = [30, 31, 48, 4, 3 ]
-    led_go = True
-
     def exposed_spawn_timer(self, seconds, seconds2):
-        p = Process(target=self.timer, args=(seconds,seconds2,self.brew_pin))
+        global brew_pin
+        p = Process(target=self.timer, args=(seconds,seconds2,brew_pin))
         self.timers.append(p)
     
     def timer(self, seconds, seconds2, pin):
@@ -25,22 +26,20 @@ class MyService(rpyc.Service):
         self.brew_off(pin)
     
     def brew_on(self):
-        if self.running == False:
-	    print self.running
-            self.on(self.brew_pin)
+        global running, brew_pin
+        if running == False:
+            self.on(brew_pin)
             time.sleep(.3)
-            self.off(self.brew_pin)
-            self.running = True
-	    print self.running
+            self.off(brew_pin)
+            running = True
     
     def brew_off(self):
-        if self.running == True:
-	    print self.running		
-            self.on(self.brew_pin)
+        global running, brew_pin
+        if running == True:
+            self.on(brew_pin)
             time.sleep(.3)
-            self.off(self.brew_pin)
-            self.running = False
-	    print self.running
+            self.off(brew_pin)
+            running = False
 
     def on(self, pin):
         os.system("echo high > /sys/class/gpio/gpio%s/direction" % pin)
@@ -49,15 +48,18 @@ class MyService(rpyc.Service):
         os.system("echo low > /sys/class/gpio/gpio%s/direction" % pin)
 
     def led_on(self):
-        for pin in self.led_pins:
+        global led_pins
+        for pin in led_pins:
             self.on(pin)
 
     def led_off(self):
-        for pin in self.led_pins:
+        global led_pins
+        for pin in led_pins:
             self.off(pin)
 
     def led_flash(delay):
-        self.led_go = True
+        global led_go
+        led_go = True
         while self.led_go:
             self.led_on()
             time.sleep(delay)
@@ -75,12 +77,12 @@ class MyService(rpyc.Service):
         pass
 
     def exposed_get_brewing(self): # this is an exposed method
-        return self.running
+        global running
+        return running
 
     def exposed_get_state(self):
-	print self.running
-        text = "running = " + str(self.running)
-	print self.running
+        global running
+        text = "running = " + str(running)
 	return text
 	
     def exposed_brew(self, boolean):
