@@ -1,21 +1,23 @@
 import rpyc
 import os
 import time
-running = False
-
-timers=[]
-
-brew_pin = 60
-
-led_pins = [30, 31, 48, 4, 3 ]
-led_go = True
-
-coffee_port = 7986
+6
 
 class MyService(rpyc.Service):
+    running = False
+
+    timers=[]   
+
+    brew_pin = 60
+
+    led_pins = [30, 31, 48, 4, 3 ]
+    led_go = True
+
+    coffee_port = 7986
+
     def exposed_spawn_timer(self, seconds, seconds2):
-        p = Process(target=Timer, args=(seconds,seconds2,heater_pin))
-        timers.append(p)
+        p = Process(target=self.timer, args=(seconds,seconds2,self.brew_pin))
+        self.timers.append(p)
     
     def timer(self, seconds, seconds2, pin):
         time.sleep(seconds)
@@ -24,14 +26,14 @@ class MyService(rpyc.Service):
         self.brew_off(pin)
     
     def brew_on(self):
-        if running is False:
-            self.on(brew_pin)
-            running = True
+        if self.running is False:
+            self.on(self.brew_pin)
+            self.running = True
     
     def brew_off(self):
-        if running is True:
-            self.off(brew_pin)
-            running = False
+        if self.running is True:
+            self.off(self.brew_pin)
+            self.running = False
 
     def on(self, pin):
         os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio%s/direction" % pin)
@@ -44,16 +46,16 @@ class MyService(rpyc.Service):
         os.system("echo low > /sys/class/gpio%s/direction" % pin)
 
     def led_on(self):
-        for pin in led_pins:
+        for pin in self.led_pins:
             self.on(pin)
 
     def led_off(self):
-        for pin in led_pins:
+        for pin in self.led_pins:
             self.off(pin)
 
     def led_flash(delay):
-        led_go = True
-        while led_go:
+        self.led_go = True
+        while self.led_go:
             self.led_on()
             time.sleep(delay)
             self.led_off()
@@ -70,10 +72,10 @@ class MyService(rpyc.Service):
         pass
 
     def exposed_get_brewing(self): # this is an exposed method
-        return running
+        return self.running
 
     def exposed_get_state(self):
-        return "running = " + str(running)
+        return "running = " + str(self.running)
 
     def exposed_brew(self, boolean):
         if(boolean):
