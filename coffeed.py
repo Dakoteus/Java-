@@ -39,13 +39,9 @@ class MyService(rpyc.Service):
             self.running = False
 
     def on(self, pin):
-        os.system("echo %s > /sys/class/gpio/export" % pin)
-        os.system("echo out > /sys/class/gpio/gpio%s/direction" % pin)
         os.system("echo high > /sys/class/gpio/gpio%s/direction" % pin)
     
     def off(self, pin):
-        os.system("echo %s > /sys/class/gpio/export" % pin)
-        os.system("echo out > /sys/class/gpio/gpio%s/direction" % pin)
         os.system("echo low > /sys/class/gpio/gpio%s/direction" % pin)
 
     def led_on(self):
@@ -92,6 +88,10 @@ class MyService(rpyc.Service):
         self.led_off()
 
 if __name__ == "__main__":
+    for pin in  [30, 31, 48, 4, 3, 60]:
+        os.system("echo %s > /sys/class/gpio/export" % pin)
+        os.system("echo out > /sys/class/gpio/gpio%s/direction" % pin)
+
     from rpyc.utils.server import ThreadedServer
     t = ThreadedServer(MyService, port = coffee_port)
     t.start()
