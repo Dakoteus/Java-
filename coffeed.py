@@ -27,21 +27,25 @@ class MyService(rpyc.Service):
     def brew_on(self):
         if self.running is False:
             self.on(self.brew_pin)
+            time.sleep(.3)
+            self.off(self.brew_pin)
             self.running = True
     
     def brew_off(self):
         if self.running is True:
+            self.on(self.brew_pin)
+            time.sleep(.3)
             self.off(self.brew_pin)
             self.running = False
 
     def on(self, pin):
-        os.system("echo %s > /sys/class/gpio/export  && echo high > /sys/class/gpio/gpio%s/direction" % (pin,pin))
-        time.sleep(.2)
-        os.system("echo low > /sys/class/gpio/gpio%s/direction" % pin)
+        os.system("echo %s > /sys/class/gpio/export" % pin)
+        os.system("echo out > /sys/class/gpio/gpio%s/direction" % pin)
+        os.system("echo high > /sys/class/gpio/gpio%s/direction" % pin)
     
     def off(self, pin):
-        os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio/gpio%s/direction" % (pin,pin))
-        time.sleep(.2)
+        os.system("echo %s > /sys/class/gpio/export" % pin)
+        os.system("echo out > /sys/class/gpio/gpio%s/direction" % pin)
         os.system("echo low > /sys/class/gpio/gpio%s/direction" % pin)
 
     def led_on(self):
