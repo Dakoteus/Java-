@@ -77,9 +77,9 @@ class MyService(rpyc.Service):
 
     def exposed_brew(self, boolean):
         if(boolean):
-            self.on()
+            self.brew_on()
         else:
-            self.off()
+            self.brew_off()
 
     def exposed_led_test(self):
         self.led_on()
