@@ -1,4 +1,4 @@
-
+#! /usr/bin/python
 
 import time, os, curses, shutil, sys, random
 import math
