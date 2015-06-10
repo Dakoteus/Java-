@@ -1,7 +1,8 @@
 import rpyc
 import os
 import time
-6
+
+coffee_port = 7986
 
 class MyService(rpyc.Service):
     running = False
@@ -12,8 +13,6 @@ class MyService(rpyc.Service):
 
     led_pins = [30, 31, 48, 4, 3 ]
     led_go = True
-
-    coffee_port = 7986
 
     def exposed_spawn_timer(self, seconds, seconds2):
         p = Process(target=self.timer, args=(seconds,seconds2,self.brew_pin))
@@ -36,14 +35,14 @@ class MyService(rpyc.Service):
             self.running = False
 
     def on(self, pin):
-        os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio%s/direction" % pin)
+        os.system("echo %s > /sys/class/gpio/export  && echo high > /sys/class/gpio/gpio%s/direction" % (pin,pin))
         time.sleep(.2)
-        os.system("echo low > /sys/class/gpio%s/direction" % pin)
+        os.system("echo low > /sys/class/gpio/gpio%s/direction" % pin)
     
     def off(self, pin):
-        os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio%s/direction" % pin)
+        os.system("echo gpio%s > /sys/class/gpio/export  && echo high > /sys/class/gpio/gpio%s/direction" % (pin,pin))
         time.sleep(.2)
-        os.system("echo low > /sys/class/gpio%s/direction" % pin)
+        os.system("echo low > /sys/class/gpio/gpio%s/direction" % pin)
 
     def led_on(self):
         for pin in self.led_pins:
