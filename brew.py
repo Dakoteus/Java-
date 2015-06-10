@@ -34,7 +34,7 @@ daemon = rpyc.connect(options.target, options.port);
 service = daemon.root
 
 
-if options.set_state:
+if options.set_state is not "none":
     on = None
 
     if options.set_state == "start":
